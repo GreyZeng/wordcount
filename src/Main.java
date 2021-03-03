@@ -38,16 +38,14 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        // 在文件大小比较小的时候，可以这样做
-        // 文件比较大的时候，只能一行一行读取
-//        List<String> allLine = Files.readAllLines(Paths.get("C:\\git\\text.txt"), StandardCharsets.UTF_8);
-//
-//        StringBuilder sb = new StringBuilder();
-//        for (String line : allLine) {
-//            sb.append(line + "\n");
-//        }
-
-        String text = "asdb_32342 sdfasdf";
+        String path = "D:\\rural.txt";
+        List<String> allLine = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        StringBuilder sb = new StringBuilder();
+        for (String line : allLine) {
+            sb.append(line + "\n");
+        }
+        String text = sb.toString();
         Map<String, Integer> result = new HashMap<>();
         // 在求line num的时候，顺带把有效的line存到这里
         List<String> lines = new ArrayList<>();
@@ -57,7 +55,7 @@ public class Main {
         PriorityQueue<Word> topWords = new PriorityQueue<>(new WordComparator());
         // 默认显示前十个
         int top = 10;
-        int charNum = charNum(text);
+        int charNum = bytes.length;
         int lineNum = lineNum(text, lines);
         int wordNum = wordNum(lines, words);
         result.put("characters", charNum);
