@@ -40,14 +40,14 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // 在文件大小比较小的时候，可以这样做
         // 文件比较大的时候，只能一行一行读取
-        List<String> allLine = Files.readAllLines(Paths.get("C:\\git\\text.txt"), StandardCharsets.UTF_8);
+//        List<String> allLine = Files.readAllLines(Paths.get("C:\\git\\text.txt"), StandardCharsets.UTF_8);
+//
+//        StringBuilder sb = new StringBuilder();
+//        for (String line : allLine) {
+//            sb.append(line + "\n");
+//        }
 
-        StringBuilder sb = new StringBuilder();
-        for (String line : allLine) {
-            sb.append(line + "\n");
-        }
-
-        String text = sb.toString();
+        String text = "asdb_32342 sdfasdf";
         Map<String, Integer> result = new HashMap<>();
         // 在求line num的时候，顺带把有效的line存到这里
         List<String> lines = new ArrayList<>();
@@ -188,10 +188,18 @@ public class Main {
         if (str.length() < 4) {
             return false;
         }
-        boolean result = true;
+        int len = str.length();
+        boolean result;
         for (int i = 0; i < 4; i++) {
             char c = str.charAt(i);
             result = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+            if (!result) {
+                return false;
+            }
+        }
+        for (int i = 4; i < len; i++) {
+            char c = str.charAt(i);
+            result = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
             if (!result) {
                 return false;
             }
