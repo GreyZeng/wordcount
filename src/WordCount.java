@@ -35,7 +35,7 @@ import java.util.*;
 //        word1: number
 //        word2: number
 //        ```
-public class Main {
+public class WordCount {
 
     public static void main(String[] args) throws IOException {
         String path = "D:\\rural.txt";
