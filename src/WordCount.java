@@ -51,8 +51,9 @@ public class WordCount {
         }
         String inputPath = args[0];
         String outputPath = args[1];
-        List<String> allLine = Files.readAllLines(Paths.get(inputPath), UTF_8);
         byte[] bytes = Files.readAllBytes(Paths.get(inputPath));
+        int charNum = bytes.length;
+        List<String> allLine = Files.readAllLines(Paths.get(inputPath), UTF_8);
         StringBuilder sb = new StringBuilder();
         for (String line : allLine) {
             sb.append(line + "\n");
@@ -67,7 +68,7 @@ public class WordCount {
         PriorityQueue<Word> topWords = new PriorityQueue<>(new WordComparator());
         // 默认显示前十个
         int top = 10;
-        int charNum = bytes.length;
+
         int lineNum = lineNum(text, lines);
         int wordNum = wordNum(lines, words);
         result.put("characters", charNum);
