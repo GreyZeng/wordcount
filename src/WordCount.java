@@ -1,15 +1,10 @@
-import static java.nio.charset.StandardCharsets.UTF_8;
-
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 //则会统计input.txt中的以下几个指标
 //
@@ -56,7 +51,7 @@ public class WordCount {
         List<String> allLine = Files.readAllLines(Paths.get(inputPath), UTF_8);
         StringBuilder sb = new StringBuilder();
         for (String line : allLine) {
-            sb.append(line + "\n");
+            sb.append(line).append("\n");
         }
         String text = sb.toString();
         Map<String, Integer> result = new HashMap<>();
@@ -80,25 +75,30 @@ public class WordCount {
 
     private static void output(Map<String, Integer> result, PriorityQueue<Word> topWords, int top, String outputPath) {
         StringBuilder sb = new StringBuilder();
-        sb.append("characters: " + result.get("characters")).append("\n").append("words: " + result.get("words")).append("\n").append("lines: " + result.get("lines"));
+        sb.append("characters: ").append(result.get("characters")).append("\n").append("words: " + result.get("words")).append("\n").append("lines: " + result.get("lines"));
 
         while (!topWords.isEmpty() && top != 0) {
             sb.append("\n");
             top--;
             Word topWord = topWords.poll();
-            sb.append(topWord.value + ": " + topWord.times);
+            sb.append(topWord.value).append(": ").append(topWord.times);
         }
-        FileUtil.contentToFile(sb.toString(), outputPath);
+        contentToFile(sb.toString(), outputPath);
     }
 
-    private static void printResult(Map<String, Integer> result, PriorityQueue<Word> topWords, int top) {
-        System.out.println("characters: " + result.get("characters"));
-        System.out.println("words: " + result.get("words"));
-        System.out.println("lines: " + result.get("lines"));
-        while (!topWords.isEmpty() && top != 0) {
-            top--;
-            Word topWord = topWords.poll();
-            System.out.println(topWord.value + ": " + topWord.times);
+    /**
+     * 将内容写入文件，返回文件路径
+     *
+     * @param content      写入内容
+     * @param fileLocation 文件路径
+     * @return
+     */
+    public static void contentToFile(String content, String fileLocation) {
+        try (FileWriter fw = new FileWriter(fileLocation)) {
+            //将str里面的内容读取到fw所指定的文件中
+            fw.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -153,19 +153,6 @@ public class WordCount {
             }
         }
         return num;
-    }
-
-    /**
-     * 统计字符数
-     *
-     * @param text 文本内容
-     * @return 字符数量
-     */
-    public static int charNum(String text) {
-        if (null == text) {
-            return 0;
-        }
-        return text.length();
     }
 
     /**
