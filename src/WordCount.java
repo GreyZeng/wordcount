@@ -1,8 +1,7 @@
-import java.io.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -171,10 +170,30 @@ public class WordCount {
     public static int wordNum(String line, Map<String, Integer> wordMap) {
         char[] str = line.toCharArray();
         int wordNum = 0;
+        for (int i = 0; i < str.length; i++) {
+            if (!isValidChar(str[i])) {
+                str[i] = ' ';
+            }
+        }
+        String newLine = String.valueOf(str);
+        String[] strings = newLine.split(" ");
+        for (String s : strings) {
+            if (isValidWord(s)) {
+                if (wordMap.containsKey(s)) {
+                    wordMap.put(s, wordMap.get(s) + 1);
+                } else {
+                    wordMap.put(s, 1);
+                }
+                wordNum++;
+            }
+        }
         // TODO
-        return -1;
+        return wordNum;
     }
 
+    public static boolean isValidChar(char i) {
+        return ((i >= 'a' && i <= 'z') || (i >= 'A' && i <= 'Z') || (i >= '0' && i <= '9'));
+    }
 
     /**
      * 判断一个字符串
