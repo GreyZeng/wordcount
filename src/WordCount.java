@@ -1,10 +1,13 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.readAllBytes;
 
 //则会统计input.txt中的以下几个指标
 //
@@ -38,6 +41,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 //        word2: number
 //        ```
 public class WordCount {
+    public static char[] getChars(byte[] bytes) {
+        ByteBuffer bb = ByteBuffer.allocate(bytes.length);
+        bb.put(bytes).flip();
+        CharBuffer cb = UTF_8.decode(bb);
+        return cb.array();
+    }
 
     public static void main(String[] args) throws IOException {
         if (args == null || args.length < 2) {
@@ -46,17 +55,14 @@ public class WordCount {
         }
         String inputPath = args[0];
         String outputPath = args[1];
-        byte[] bytes = Files.readAllBytes(Paths.get(inputPath));
+        // 这个方法有大小限制
+        byte[] bytes = readAllBytes(Paths.get(inputPath));
         int charNum = bytes.length;
-        List<String> allLine = Files.readAllLines(Paths.get(inputPath), UTF_8);
-        StringBuilder sb = new StringBuilder();
-        for (String line : allLine) {
-            sb.append(line).append("\n");
-        }
-        String text = sb.toString();
+        char[] c = getChars(bytes);
+        String text = String.valueOf(c);
         Map<String, Integer> result = new HashMap<>();
         // 在求line num的时候，顺带把有效的line存到这里
-        List<String> lines = new ArrayList<>();
+        List<String> lines = getAllLine(text);
         // 在求word数量的时候，把有效的word存在这里，之所以用TreeSet是保持输出的word可以按要求排序
         Map<String, Integer> words = new HashMap<>();
         // 大根堆 保证词频大的在堆顶，词频一样保证字典序小的在堆顶
@@ -64,18 +70,32 @@ public class WordCount {
         // 默认显示前十个
         int top = 10;
 
-        int lineNum = lineNum(text, lines);
+        int lineNum = lines.size();
         int wordNum = wordNum(lines, words);
         result.put("characters", charNum);
         result.put("words", wordNum);
         result.put("lines", lineNum);
         fillTopWords(words, topWords);
+        // System.out.println(result);
         output(result, topWords, top, outputPath);
+    }
+
+    private static List<String> getAllLine(String text) throws IOException {
+        String[] split = text.split("\n");
+        List<String> lines = new ArrayList<>();
+        for (String line : split) {
+            if (!line.trim().isEmpty()) {
+                lines.add(line);
+            }
+        }
+        return lines;
     }
 
     private static void output(Map<String, Integer> result, PriorityQueue<Word> topWords, int top, String outputPath) {
         StringBuilder sb = new StringBuilder();
-        sb.append("characters: ").append(result.get("characters")).append("\n").append("words: " + result.get("words")).append("\n").append("lines: " + result.get("lines"));
+        sb.append("characters: ").append(result.get("characters")).append("\n")
+                .append("words: ").append(result.get("words")).append("\n")
+                .append("lines: ").append(result.get("lines"));
 
         while (!topWords.isEmpty() && top != 0) {
             sb.append("\n");
@@ -132,30 +152,6 @@ public class WordCount {
     }
 
     /**
-     * 统计行数
-     *
-     * @param text  文本
-     * @param lines 有效行的内容
-     * @return 行数
-     */
-    public static int lineNum(String text, List<String> lines) {
-        if (null == text) {
-            return 0;
-        }
-        int num = 0;
-        for (String line : text.split("\n")) {
-            String l = line.trim();
-            if (!l.isEmpty()) {
-                // jdk11 提供了line.isBlank() 方法可以直接判断
-                num++;
-                // 顺带拿到每一行的内容，方便后续直接求words的数量
-                lines.add(l);
-            }
-        }
-        return num;
-    }
-
-    /**
      * 获取单词数量
      *
      * @param lines   lines中的每一行肯定是不全是空白符的有效行数，且trim过了
@@ -173,21 +169,12 @@ public class WordCount {
     }
 
     public static int wordNum(String line, Map<String, Integer> wordMap) {
-        String[] words = line.split("\\W+");
-        int num = 0;
-        for (String word : words) {
-            // 是有效字符
-            if (isValidWord(word)) {
-                if (wordMap.containsKey(word)) {
-                    wordMap.put(word, wordMap.get(word) + 1);
-                } else {
-                    wordMap.put(word, 1);
-                }
-                num++;
-            }
-        }
-        return num;
+        char[] str = line.toCharArray();
+        int wordNum = 0;
+        // TODO
+        return -1;
     }
+
 
     /**
      * 判断一个字符串
